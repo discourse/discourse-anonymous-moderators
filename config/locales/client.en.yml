@@ -1,0 +1,5 @@
+en:
+  js:
+    anonymous_user:
+      switch_to_anon: Switch to anonymous user account
+      switch_to_master: Switch to master user account

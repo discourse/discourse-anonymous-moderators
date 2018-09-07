@@ -1,0 +1,7 @@
+en:
+  site_settings:
+    anonymous_user_enabled: Allow users to access a second 'anonymous' user account?
+    anonymous_user_allowed_users: Users with access to anonymous feature. 'users_only' is the most secure!
+    anonymous_user_required_trust_level: Required trust level to access the anonymous feature.
+    anonymous_user_maintain_moderator: Staff anonymous accounts have moderator privaledges. It is more secure to leave this disabled!
+    anonymous_user_username_prefix: Beginning of the username for anonymous accounts.

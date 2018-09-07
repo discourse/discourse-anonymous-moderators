@@ -1,0 +1,18 @@
+plugins:
+  anonymous_user_enabled:
+    default: false
+    client: true
+  anonymous_user_allowed_users:
+    default: users_only
+    type: enum
+    choices:
+      - users_only
+      - users_and_staff
+      - staff_only
+  anonymous_user_required_trust_level:
+    default: 1
+    enum: 'TrustLevelSetting'
+  anonymous_user_maintain_moderator:
+    default: false
+  anonymous_user_username_prefix:
+    default: "anonymous"
