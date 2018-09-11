@@ -25,7 +25,7 @@ module AnonymousUser
 
     def self.fetch_anonymous_user(anonymous_link)
       raise Discourse::InvalidAccess unless acceptable_link?(anonymous_link)
-      anonymous_link.user.update!(Manager.enforced_shadow_params(anonymous_link.user, anonymous_link.parent_user))
+      anonymous_link.user.update!(Manager.enforced_shadow_params(anonymous_link.parent_user, anonymous_link.user))
       anonymous_link.user
     end
 
