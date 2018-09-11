@@ -5,3 +5,4 @@ en:
     anonymous_user_required_trust_level: Required trust level to access the anonymous feature.
     anonymous_user_maintain_moderator: Staff anonymous accounts have moderator privaledges. It is more secure to leave this disabled!
     anonymous_user_username_prefix: Beginning of the username for anonymous accounts.
+    anonymous_user_show_identity_staff: Allow staff to see the identity of the anonymous user in the user interface.

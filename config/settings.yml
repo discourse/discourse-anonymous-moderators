@@ -16,3 +16,6 @@ plugins:
     default: false
   anonymous_user_username_prefix:
     default: "anonymous"
+  anonymous_user_show_identity_staff:
+    default: false
+    client: true

@@ -27,8 +27,13 @@ after_initialize do
     object.can_become_anonymous
   end
 
+  add_model_callback("AnonymousUser::Link", :after_commit, on: [ :create, :update ]) do
+    UserCustomField.find_or_initialize_by(user: user, name: :parent_user_username).update_attributes!(value: parent_user.username)
+  end
+
+  whitelist_staff_user_custom_field :parent_user_username
+
   # TODO: skip emails for anon, based on site setting. Will likely require a new hook in core
   # TODO: add timeout setting, to match core functionality
   # TODO: core makes post_can_act? false for anon users. Prevents likes/flags
-  # TODO: optionally display anon's true identity to staff
 end

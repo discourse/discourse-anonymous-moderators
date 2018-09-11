@@ -1,7 +1,11 @@
 import { withPluginApi } from "discourse/lib/plugin-api";
 import { ajax } from "discourse/lib/ajax";
+import { iconNode } from "discourse-common/lib/icon-library";
+import { userPath } from "discourse/lib/url";
 
 function initializeAnonymousUser(api) {
+  const siteSettings = api.container.lookup("site-settings:main");
+
   api.attachWidgetAction("user-menu", "switchToAnonUser", () => {
     ajax("/anonymous-user/become-anon", { method: "POST" }).then(() => {
       window.location.reload();
@@ -32,6 +36,29 @@ function initializeAnonymousUser(api) {
       return false;
     }
   });
+
+  if (siteSettings.anonymous_user_show_identity_staff) {
+    api.decorateWidget(`poster-name:after`, dec => {
+      const attrs = dec.attrs;
+      const username = (attrs.userCustomFields || {}).parent_user_username;
+      if (!username) {
+        return null;
+      }
+      return dec.h(
+        "span.poster-parent-username",
+        dec.h(
+          "a",
+          {
+            attributes: {
+              "data-user-card": username,
+              href: userPath()
+            }
+          },
+          [iconNode("user-secret"), username]
+        )
+      );
+    });
+  }
 }
 
 export default {
