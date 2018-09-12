@@ -47,14 +47,14 @@ function initializeAnonymousUser(api) {
       return dec.h(
         "span.poster-parent-username",
         dec.h(
-          "a",
+          "a.anon-identity",
           {
             attributes: {
               "data-user-card": username,
               href: userPath()
             }
           },
-          [iconNode("user-secret"), username]
+          [iconNode("user-secret"), ` ${username}`]
         )
       );
     });

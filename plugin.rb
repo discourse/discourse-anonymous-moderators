@@ -9,6 +9,8 @@ enabled_site_setting :anonymous_user_enabled
 require_relative "lib/anonymous_user/engine"
 require_relative "lib/anonymous_user/manager"
 
+register_asset 'stylesheets/anonymous_user.scss'
+
 after_initialize do
 
   add_to_class(:user, :is_anonymous_user) do
