@@ -7,6 +7,8 @@ module AnonymousUser
 
       if anonymous_link = Link.find_by(user: user, deactivated_at: nil)
         fetch_parent_user(anonymous_link)
+      else
+        raise Discourse::NotFound
       end
     end
 
@@ -15,9 +17,10 @@ module AnonymousUser
       return unless user
 
       anonymous_link = Link.find_by(parent_user: user, deactivated_at: nil)
-      if !anonymous_link && acceptable_parent?(user)
-        anonymous_link = create_shadow(user)
+      if anonymous_link.nil?
+        anonymous_link = create_child(user)
       end
+
       fetch_anonymous_user(anonymous_link)
     end
 
@@ -25,7 +28,7 @@ module AnonymousUser
 
     def self.fetch_anonymous_user(anonymous_link)
       raise Discourse::InvalidAccess unless acceptable_link?(anonymous_link)
-      anonymous_link.user.update!(Manager.enforced_shadow_params(anonymous_link.parent_user, anonymous_link.user))
+      anonymous_link.user.update!(Manager.enforced_child_params(parent: anonymous_link.parent_user, child: anonymous_link.user))
       anonymous_link.user
     end
 
@@ -58,8 +61,8 @@ module AnonymousUser
       true
     end
 
-    def self.create_shadow(user)
-
+    def self.create_child(user)
+      raise Discourse::InvalidAccess unless acceptable_parent?(user)
       User.transaction do
         create_params = {
           password: SecureRandom.hex,
@@ -67,24 +70,24 @@ module AnonymousUser
           created_at: 1.day.ago # bypass new user restrictions
         }
 
-        create_params.merge!(enforced_shadow_params(user, nil))
+        create_params.merge!(enforced_child_params(parent: user))
 
-        shadow = User.create!(create_params)
+        child = User.create!(create_params)
 
-        shadow.user_option.update_columns(
+        child.user_option.update_columns(
           email_digests: false
         )
 
-        Link.create!(user: shadow, parent_user: user, last_used_at: Time.zone.now)
+        Link.create!(user: child, parent_user: user, last_used_at: Time.zone.now)
       end
     end
 
-    def self.enforced_shadow_params(parent_user, shadow_user)
-      username = shadow_user&.username || UserNameSuggester.suggest(SiteSetting.anonymous_user_username_prefix)
-      email = parent_user.email.sub('@', "+#{username}@") # Use plus addressing
+    def self.enforced_child_params(parent: , child: nil)
+      username = child&.username || UserNameSuggester.suggest(SiteSetting.anonymous_user_username_prefix)
+      email = parent.email.sub('@', "+#{username}@") # Use plus addressing
 
       if SiteSetting.anonymous_user_maintain_moderator
-        moderator = parent_user.moderator || parent_user.admin
+        moderator = parent.moderator || parent.admin
       else
         moderator = false
       end
@@ -99,7 +102,7 @@ module AnonymousUser
         moderator: moderator,
         approved: true
       }
-      params.merge!(username: username) unless shadow_user
+      params.merge!(username: username) unless child
 
       params
     end
