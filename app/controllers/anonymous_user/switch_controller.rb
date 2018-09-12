@@ -1,6 +1,7 @@
 module ::AnonymousUser
   class SwitchController < ::ApplicationController
     requires_plugin PLUGIN_NAME
+    before_action :ensure_logged_in
 
     def become_child
       user = Manager.get_child(current_user)
@@ -8,7 +9,7 @@ module ::AnonymousUser
         log_on_user(user)
         render json: success_json
       else
-        render_json_error
+        failed_json
       end
     end
 
@@ -18,7 +19,7 @@ module ::AnonymousUser
         log_on_user(user)
         render json: success_json
       else
-        render_json_error
+        failed_json
       end
     end
   end
