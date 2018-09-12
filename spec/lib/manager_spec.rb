@@ -109,4 +109,27 @@ describe AnonymousUser::Manager do
 
   end
 
+  describe "create_child" do
+    it "works correctly" do
+      newlink = AnonymousUser::Manager.create_child(parent1)
+      expect(AnonymousUser::Manager.get_child(parent1)).to eq(newlink.user)
+
+      expect(newlink.user.email).to eq(parent1.email.sub("@", "+#{newlink.user.username}@"))
+      expect(newlink.user.moderator).to eq(false)
+    end
+  end
+
+  describe "enforced_child_parameters" do
+    it "works with child" do
+      params = AnonymousUser::Manager.enforced_child_params(parent: parent1, child: anon1)
+      expect(params[:username]).to eq(nil)
+      expect(params[:active]).to eq(true)
+    end
+
+    it "works without child" do
+      params = AnonymousUser::Manager.enforced_child_params(parent: parent1)
+      expect(params[:username].starts_with?(SiteSetting.anonymous_user_username_prefix)).to eq(true)
+    end
+  end
+
 end
