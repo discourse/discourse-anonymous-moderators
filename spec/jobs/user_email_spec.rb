@@ -1,3 +1,6 @@
+require 'rails_helper'
+require_dependency 'jobs/base'
+
 describe Jobs::UserEmail do
   let(:user) { Fabricate(:user, last_seen_at: 11.minutes.ago) }
   let(:parent_user) { Fabricate(:user, last_seen_at: 11.minutes.ago) }
