@@ -35,6 +35,21 @@ after_initialize do
 
   whitelist_staff_user_custom_field :parent_user_username
 
+  module ModifyUserEmail
+    def execute(args)
+      return super(args) unless SiteSetting.anonymous_user_enabled
+
+      if parent = AnonymousUser::Link.find_by(user_id: args[:user_id])&.parent_user
+        args[:to_address] = parent.email
+      end
+      super(args)
+    end
+  end
+
+  ::Jobs::UserEmail.class_eval do
+    prepend ModifyUserEmail
+  end
+
   # TODO: skip emails for anon, based on site setting. Will likely require a new hook in core
   # TODO: add timeout setting, to match core functionality
   # TODO: core makes post_can_act? false for anon users. Prevents likes/flags
