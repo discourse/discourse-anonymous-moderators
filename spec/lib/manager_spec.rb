@@ -100,6 +100,8 @@ describe AnonymousUser::Manager do
     it "only allows tl1 users" do
       expect(AnonymousUser::Manager.acceptable_child?(anon1)).to eq(true)
       expect(AnonymousUser::Manager.acceptable_child?(tl2_anon)).to eq(false)
+      SiteSetting.anonymous_user_allowed_users = :staff_only
+      expect(AnonymousUser::Manager.acceptable_child?(tl2_anon)).to eq(true)
     end
 
     it "does not allow parents to be children" do

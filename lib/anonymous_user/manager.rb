@@ -47,7 +47,7 @@ module AnonymousUser
 
     def self.acceptable_child?(user)
       return false if user.admin
-      return false if user.trust_level > 1
+      return false if user.trust_level > 1 && SiteSetting.anonymous_user_allowed_users.to_sym != :staff_only
       return false if Link.exists?(parent_user: user) # Is a parent
       if !SiteSetting.anonymous_user_maintain_moderator
         return false if user.moderator
