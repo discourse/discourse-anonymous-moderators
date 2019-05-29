@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
-describe AnonymousUser::Link do
+describe DiscourseAnonymousUser::Link do
   let(:user1) { Fabricate(:user) }
   let(:user2) { Fabricate(:user) }
   let(:user3) { Fabricate(:user) }

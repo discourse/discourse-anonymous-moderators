@@ -1,4 +1,6 @@
-module AnonymousUser
+# frozen_string_literal: true
+
+module DiscourseAnonymousUser
   class Manager
 
     def self.get_parent(user)

@@ -1,5 +1,8 @@
-module AnonymousUser
+# frozen_string_literal: true
+
+module DiscourseAnonymousUser
   class Link < ActiveRecord::Base
+    self.table_name = "anonymous_user_links"
     belongs_to :user
     belongs_to :parent_user, class_name: :User
   end

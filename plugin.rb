@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # name: discourse-anonymous-user
 # about: Allow users to have an alternative account for posting anonymously
 # version: 0.1
@@ -14,11 +16,11 @@ register_asset 'stylesheets/anonymous_user.scss'
 after_initialize do
 
   add_to_class(:user, :is_anonymous_user) do
-    return AnonymousUser::Link.exists?(user: self)
+    return DiscourseAnonymousUser::Link.exists?(user: self)
   end
 
   add_to_class(:user, :can_become_anonymous) do
-    return AnonymousUser::Manager.acceptable_parent?(self)
+    return DiscourseAnonymousUser::Manager.acceptable_parent?(self)
   end
 
   add_to_serializer(:current_user, :is_anonymous_user) do
@@ -29,7 +31,7 @@ after_initialize do
     object.can_become_anonymous
   end
 
-  add_model_callback("AnonymousUser::Link", :after_commit, on: [ :create, :update ]) do
+  add_model_callback("DiscourseAnonymousUser::Link", :after_commit, on: [ :create, :update ]) do
     UserCustomField.find_or_initialize_by(user: user, name: :parent_user_username).update_attributes!(value: parent_user.username)
   end
 
@@ -39,7 +41,7 @@ after_initialize do
     def execute(args)
       return super(args) unless SiteSetting.anonymous_user_enabled
 
-      if parent = AnonymousUser::Link.find_by(user_id: args[:user_id])&.parent_user
+      if parent = DiscourseAnonymousUser::Link.find_by(user_id: args[:user_id])&.parent_user
         args[:to_address] = parent.email
       end
       super(args)

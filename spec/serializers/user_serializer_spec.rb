@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe UserSerializer do
 
   before do
@@ -6,7 +8,7 @@ describe UserSerializer do
 
   let(:user1) { Fabricate(:user) }
   let(:user2) { Fabricate(:user) }
-  let!(:link) { AnonymousUser::Link.create!(user: user1, parent_user: user2, last_used_at: Time.zone.now) }
+  let!(:link) { DiscourseAnonymousUser::Link.create!(user: user1, parent_user: user2, last_used_at: Time.zone.now) }
   let(:moderator) { Fabricate(:moderator) }
 
   context "for regular users" do
