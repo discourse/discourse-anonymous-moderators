@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateAnonymousUserLink < ActiveRecord::Migration[5.2]
   def change
     create_table :anonymous_user_links do |t|

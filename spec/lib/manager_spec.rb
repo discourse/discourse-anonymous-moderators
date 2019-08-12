@@ -2,137 +2,102 @@
 
 require 'rails_helper'
 
-describe DiscourseAnonymousUser::Manager do
+describe DiscourseAnonymousModerators::Manager do
   let(:parent1) { Fabricate(:user) }
   let(:anon1) { Fabricate(:user) }
-  let(:anon2) { Fabricate(:user) }
-  let(:tl2_anon) { Fabricate(:user, trust_level: TrustLevel[2]) }
 
   let(:admin_parent) { Fabricate(:user, admin: true) }
 
   let(:moderator_parent) { Fabricate(:user, moderator: true) }
   let(:moderator_anon) { Fabricate(:user, moderator: true) }
+  let(:moderator_anon2) { Fabricate(:user, moderator: true) }
 
-  let(:link) { DiscourseAnonymousUser::Link.create!(user: anon1, parent_user: parent1, last_used_at: Time.zone.now) }
-  let(:link_mod_to_mod) { DiscourseAnonymousUser::Link.create!(user: moderator_anon, parent_user: moderator_parent, last_used_at: Time.zone.now) }
-  let(:link_mod_to_regular) { DiscourseAnonymousUser::Link.create!(user: anon1, parent_user: moderator_parent, last_used_at: Time.zone.now) }
-  let(:link_regular_to_mod) { DiscourseAnonymousUser::Link.create!(user: moderator_anon, parent_user: parent1, last_used_at: Time.zone.now) }
-  let(:deactivated_link) { DiscourseAnonymousUser::Link.create!(user: anon2, parent_user: parent1, last_used_at: Time.zone.now, deactivated_at: Time.zone.now) }
+  let(:link_mod_to_mod) { DiscourseAnonymousModerators::Link.create!(user: moderator_anon, parent_user: moderator_parent, last_used_at: Time.zone.now) }
+  let(:deactivated_link) { DiscourseAnonymousModerators::Link.create!(user: moderator_anon2, parent_user: moderator_parent, last_used_at: Time.zone.now, deactivated_at: Time.zone.now) }
 
   before do
-    SiteSetting.anonymous_user_enabled = true
+    SiteSetting.anonymous_moderators_enabled = true
   end
 
   describe "switching to existing anonymous account" do
 
     it "returns nil when disabled" do
-      link
-      expect(DiscourseAnonymousUser::Manager.get_child(parent1)).to eq(anon1)
-      SiteSetting.anonymous_user_enabled = false
-      expect(DiscourseAnonymousUser::Manager.get_child(parent1)).to eq(nil)
+      link_mod_to_mod
+      expect(DiscourseAnonymousModerators::Manager.get_child(moderator_parent)).to eq(moderator_anon)
+      SiteSetting.anonymous_moderators_enabled = false
+      expect(DiscourseAnonymousModerators::Manager.get_child(moderator_parent)).to eq(nil)
     end
 
     it "finds an associated account correctly" do
-      link
-      expect(DiscourseAnonymousUser::Manager.get_child(parent1)).to eq(anon1)
+      link_mod_to_mod
+      expect(DiscourseAnonymousModerators::Manager.get_child(moderator_parent)).to eq(moderator_anon)
     end
 
     it "ignores deactivated links" do
-      link
+      link_mod_to_mod
       deactivated_link
-      expect(DiscourseAnonymousUser::Link.where(parent_user: parent1).count).to eq(2)
-      expect(DiscourseAnonymousUser::Manager.get_child(parent1)).to eq(anon1)
+      expect(DiscourseAnonymousModerators::Link.where(parent_user: moderator_parent).count).to eq(2)
+      expect(DiscourseAnonymousModerators::Manager.get_child(moderator_parent)).to eq(moderator_anon)
     end
 
     it "checks the parent correctly" do
-      link
-      anon1.update!(admin: true)
-      expect { DiscourseAnonymousUser::Manager.get_child(parent1) }.to raise_error(Discourse::InvalidAccess)
+      link_mod_to_mod
+      moderator_parent.update!(moderator: false)
+      expect { DiscourseAnonymousModerators::Manager.get_child(moderator_parent) }.to raise_error(Discourse::InvalidAccess)
     end
 
     it "checks the child correctly" do
-      link
       link_mod_to_mod
-      expect { DiscourseAnonymousUser::Manager.get_child(moderator_parent) }.to raise_error(Discourse::InvalidAccess)
+      moderator_anon.update!(admin: true)
+      expect { DiscourseAnonymousModerators::Manager.get_child(moderator_parent) }.to raise_error(Discourse::InvalidAccess)
     end
 
   end
 
   describe "acceptable_parent?" do
-    it "allows only regular users by default" do
-      expect(DiscourseAnonymousUser::Manager.acceptable_parent?(moderator_parent)).to eq(false)
-      expect(DiscourseAnonymousUser::Manager.acceptable_parent?(parent1)).to eq(true)
-    end
-
-    it "allows users and staff when configured" do
-      SiteSetting.anonymous_user_allowed_users = :users_and_staff
-      expect(DiscourseAnonymousUser::Manager.acceptable_parent?(moderator_parent)).to eq(true)
-      expect(DiscourseAnonymousUser::Manager.acceptable_parent?(parent1)).to eq(true)
-    end
-
-    it "allows only staff when configured" do
-      SiteSetting.anonymous_user_allowed_users = :staff_only
-      expect(DiscourseAnonymousUser::Manager.acceptable_parent?(moderator_parent)).to eq(true)
-      expect(DiscourseAnonymousUser::Manager.acceptable_parent?(parent1)).to eq(false)
-    end
-
-    it "restricts by trust level" do
-      expect(DiscourseAnonymousUser::Manager.acceptable_parent?(parent1)).to eq(true)
-      SiteSetting.anonymous_user_required_trust_level = 2
-      expect(DiscourseAnonymousUser::Manager.acceptable_parent?(parent1)).to eq(false)
+    it "does not allow regular users" do
+      expect(DiscourseAnonymousModerators::Manager.acceptable_parent?(moderator_parent)).to eq(true)
+      expect(DiscourseAnonymousModerators::Manager.acceptable_parent?(parent1)).to eq(false)
     end
 
     it "does not allow children to be parents" do
-      link
-      expect(DiscourseAnonymousUser::Manager.acceptable_parent?(anon1)).to eq(false)
+      link_mod_to_mod
+      expect(DiscourseAnonymousModerators::Manager.acceptable_parent?(moderator_anon)).to eq(false)
     end
   end
 
   describe "acceptable_child?" do
     it "denies admins" do
-      expect(DiscourseAnonymousUser::Manager.acceptable_child?(admin_parent)).to eq(false)
-    end
-
-    it "only allows moderators if configured" do
-      expect(DiscourseAnonymousUser::Manager.acceptable_child?(moderator_anon)).to eq(false)
-      SiteSetting.anonymous_user_maintain_moderator = true
-      expect(DiscourseAnonymousUser::Manager.acceptable_child?(moderator_anon)).to eq(true)
-    end
-
-    it "only allows tl1 users" do
-      expect(DiscourseAnonymousUser::Manager.acceptable_child?(anon1)).to eq(true)
-      expect(DiscourseAnonymousUser::Manager.acceptable_child?(tl2_anon)).to eq(false)
-      SiteSetting.anonymous_user_allowed_users = :staff_only
-      expect(DiscourseAnonymousUser::Manager.acceptable_child?(tl2_anon)).to eq(true)
+      expect(DiscourseAnonymousModerators::Manager.acceptable_child?(admin_parent)).to eq(false)
     end
 
     it "does not allow parents to be children" do
-      link
-      expect(DiscourseAnonymousUser::Manager.acceptable_child?(parent1)).to eq(false)
+      link_mod_to_mod
+      expect(DiscourseAnonymousModerators::Manager.acceptable_child?(moderator_parent)).to eq(false)
     end
 
   end
 
   describe "create_child" do
     it "works correctly" do
-      newlink = DiscourseAnonymousUser::Manager.create_child(parent1)
-      expect(DiscourseAnonymousUser::Manager.get_child(parent1)).to eq(newlink.user)
+      newlink = DiscourseAnonymousModerators::Manager.create_child(moderator_parent)
+      expect(DiscourseAnonymousModerators::Manager.get_child(moderator_parent)).to eq(newlink.user)
 
-      expect(newlink.user.email).to eq(parent1.email.sub("@", "+#{newlink.user.username}@"))
-      expect(newlink.user.moderator).to eq(false)
+      expect(newlink.user.email).to eq(moderator_parent.email.sub("@", "+#{newlink.user.username}@"))
+      expect(newlink.user.moderator).to eq(true)
     end
   end
 
   describe "enforced_child_parameters" do
     it "works with child" do
-      params = DiscourseAnonymousUser::Manager.enforced_child_params(parent: parent1, child: anon1)
+      params = DiscourseAnonymousModerators::Manager.enforced_child_params(parent: moderator_parent, child: moderator_anon)
       expect(params[:username]).to eq(nil)
       expect(params[:active]).to eq(true)
     end
 
     it "works without child" do
-      params = DiscourseAnonymousUser::Manager.enforced_child_params(parent: parent1)
-      expect(params[:username].starts_with?(SiteSetting.anonymous_user_username_prefix)).to eq(true)
+      params = DiscourseAnonymousModerators::Manager.enforced_child_params(parent: moderator_parent)
+      expect(params[:username].starts_with?(SiteSetting.anonymous_moderators_username_prefix)).to eq(true)
     end
   end
 

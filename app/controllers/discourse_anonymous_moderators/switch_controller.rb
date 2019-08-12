@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module ::DiscourseAnonymousUser
+module ::DiscourseAnonymousModerators
   class SwitchController < ::ApplicationController
     requires_plugin PLUGIN_NAME
     before_action :ensure_logged_in

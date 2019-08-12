@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-module DiscourseAnonymousUser
+module DiscourseAnonymousModerators
   class Manager
 
     def self.get_parent(user)
-      return unless SiteSetting.anonymous_user_enabled
+      return unless SiteSetting.anonymous_moderators_enabled
       return unless user
 
       if anonymous_link = Link.find_by(user: user, deactivated_at: nil)
@@ -15,7 +15,7 @@ module DiscourseAnonymousUser
     end
 
     def self.get_child(user)
-      return unless SiteSetting.anonymous_user_enabled
+      return unless SiteSetting.anonymous_moderators_enabled
       return unless user
 
       anonymous_link = Link.find_by(parent_user: user, deactivated_at: nil)
@@ -40,20 +40,14 @@ module DiscourseAnonymousUser
     end
 
     def self.acceptable_parent?(user)
-      return false if SiteSetting.anonymous_user_allowed_users.to_sym == :users_only && user.staff?
-      return false if SiteSetting.anonymous_user_allowed_users.to_sym == :staff_only && !user.staff?
-      return false unless user.has_trust_level?(SiteSetting.anonymous_user_required_trust_level)
+      return false if !user.staff?
       return false if Link.exists?(user: user) # Is already a child
       true
     end
 
     def self.acceptable_child?(user)
       return false if user.admin
-      return false if user.trust_level > 1 && SiteSetting.anonymous_user_allowed_users.to_sym != :staff_only
       return false if Link.exists?(parent_user: user) # Is a parent
-      if !SiteSetting.anonymous_user_maintain_moderator
-        return false if user.moderator
-      end
       true
     end
 
@@ -85,14 +79,8 @@ module DiscourseAnonymousUser
     end
 
     def self.enforced_child_params(parent: , child: nil)
-      username = child&.username || UserNameSuggester.suggest(SiteSetting.anonymous_user_username_prefix)
+      username = child&.username || UserNameSuggester.suggest(SiteSetting.anonymous_moderators_username_prefix)
       email = parent.email.sub('@', "+#{username}@") # Use plus addressing
-
-      if SiteSetting.anonymous_user_maintain_moderator
-        moderator = parent.moderator || parent.admin
-      else
-        moderator = false
-      end
 
       params = {
         email: email,
@@ -101,7 +89,7 @@ module DiscourseAnonymousUser
         active: true,
         trust_level: 1,
         manual_locked_trust_level: 1,
-        moderator: moderator,
+        moderator: true,
         approved: true
       }
       params.merge!(username: username) unless child

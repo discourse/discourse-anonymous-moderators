@@ -14,11 +14,7 @@ export default Ember.Component.extend({
 
   @computed("username")
   shouldDisplay(username) {
-    return (
-      this.get("siteSettings.anonymous_user_show_identity_staff") &&
-      this.get("currentUser.staff") &&
-      username
-    );
+    return this.get("currentUser.staff") && username;
   },
 
   @computed("username")
