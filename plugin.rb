@@ -1,37 +1,37 @@
 # frozen_string_literal: true
 
-# name: discourse-anonymous-user
-# about: Allow users to have an alternative account for posting anonymously
-# version: 0.1
+# name: discourse-anonymous-moderators
+# about: Allow moderators to have an alternative account for performing actions
+# version: 1.0
 # authors: David Taylor
-# url: https://github.com/discourse/discourse-anonymous-user
+# url: https://github.com/discourse/discourse-anonymous-moderators
 
-enabled_site_setting :anonymous_user_enabled
+enabled_site_setting :anonymous_moderators_enabled
 
-require_relative "lib/anonymous_user/engine"
-require_relative "lib/anonymous_user/manager"
+require_relative "lib/anonymous_moderators/engine"
+require_relative "lib/anonymous_moderators/manager"
 
-register_asset 'stylesheets/anonymous_user.scss'
+register_asset 'stylesheets/anonymous_moderators.scss'
 
 after_initialize do
 
-  add_to_class(:user, :is_anonymous_user) do
-    return DiscourseAnonymousUser::Link.exists?(user: self)
+  add_to_class(:user, :is_anonymous_moderator) do
+    return DiscourseAnonymousModerators::Link.exists?(user: self)
   end
 
-  add_to_class(:user, :can_become_anonymous) do
-    return DiscourseAnonymousUser::Manager.acceptable_parent?(self)
+  add_to_class(:user, :can_become_anonymous_moderator) do
+    return DiscourseAnonymousModerators::Manager.acceptable_parent?(self)
   end
 
-  add_to_serializer(:current_user, :is_anonymous_user) do
-    object.is_anonymous_user
+  add_to_serializer(:current_user, :is_anonymous_moderator) do
+    object.is_anonymous_moderator
   end
 
-  add_to_serializer(:current_user, :can_become_anonymous) do
-    object.can_become_anonymous
+  add_to_serializer(:current_user, :can_become_anonymous_moderator) do
+    object.can_become_anonymous_moderator
   end
 
-  add_model_callback("DiscourseAnonymousUser::Link", :after_commit, on: [ :create, :update ]) do
+  add_model_callback("DiscourseAnonymousModerators::Link", :after_commit, on: [ :create, :update ]) do
     UserCustomField.find_or_initialize_by(user: user, name: :parent_user_username).update_attributes!(value: parent_user.username)
   end
 
@@ -39,9 +39,9 @@ after_initialize do
 
   module ModifyUserEmail
     def execute(args)
-      return super(args) unless SiteSetting.anonymous_user_enabled
+      return super(args) unless SiteSetting.anonymous_moderators_enabled
 
-      if parent = DiscourseAnonymousUser::Link.find_by(user_id: args[:user_id])&.parent_user
+      if parent = DiscourseAnonymousModerators::Link.find_by(user_id: args[:user_id])&.parent_user
         args[:to_address] = parent.email
       end
       super(args)
@@ -51,8 +51,4 @@ after_initialize do
   ::Jobs::UserEmail.class_eval do
     prepend ModifyUserEmail
   end
-
-  # TODO: skip emails for anon, based on site setting. Will likely require a new hook in core
-  # TODO: add timeout setting, to match core functionality
-  # TODO: core makes post_can_act? false for anon users. Prevents likes/flags
 end
