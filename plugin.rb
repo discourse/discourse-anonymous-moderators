@@ -35,7 +35,12 @@ after_initialize do
     UserCustomField.find_or_initialize_by(user: user, name: :parent_user_username).update_attributes!(value: parent_user.username)
   end
 
-  whitelist_staff_user_custom_field :parent_user_username
+  # TODO Drop after Discourse 2.6.0 release
+  if respond_to?(:whitelist_staff_user_custom_field)
+    whitelist_staff_user_custom_field(:parent_user_username)
+  else
+    allow_staff_user_custom_field(:parent_user_username)
+  end
 
   module ModifyUserEmail
     def execute(args)
