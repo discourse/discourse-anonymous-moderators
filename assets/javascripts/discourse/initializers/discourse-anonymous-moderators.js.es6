@@ -16,26 +16,26 @@ function initializeAnonymousUser(api) {
     });
   });
 
-  api.addUserMenuGlyph(widget => {
+  api.addUserMenuGlyph((widget) => {
     const user = widget.currentUser;
     if (user.can_become_anonymous_moderator) {
       return {
         label: "anonymous_moderators.switch_to_anon",
         icon: "user-secret",
-        action: "switchToAnonUser"
+        action: "switchToAnonUser",
       };
     } else if (user.is_anonymous_moderator) {
       return {
         label: "anonymous_moderators.switch_to_master",
         icon: "ban",
-        action: "switchToMasterUser"
+        action: "switchToMasterUser",
       };
     } else {
       return false;
     }
   });
 
-  api.decorateWidget(`poster-name:after`, dec => {
+  api.decorateWidget(`poster-name:after`, (dec) => {
     const attrs = dec.attrs;
     const username = (attrs.userCustomFields || {}).parent_user_username;
     if (!username) {
@@ -48,8 +48,8 @@ function initializeAnonymousUser(api) {
         {
           attributes: {
             "data-user-card": username,
-            href: userPath()
-          }
+            href: userPath(),
+          },
         },
         [iconNode("user-secret"), ` ${username}`]
       )
@@ -65,5 +65,5 @@ export default {
     if (siteSettings.anonymous_moderators_enabled) {
       withPluginApi("0.8", initializeAnonymousUser);
     }
-  }
+  },
 };

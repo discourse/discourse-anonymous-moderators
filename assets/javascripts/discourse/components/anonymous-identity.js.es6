@@ -23,5 +23,5 @@ export default Ember.Component.extend({
       return false;
     }
     return username;
-  }
+  },
 });
