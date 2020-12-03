@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+# rubocop:disable Discourse/NoAddReferenceOrAliasesActiveRecordMigration
 
 class CreateAnonymousUserLink < ActiveRecord::Migration[5.2]
   def change
