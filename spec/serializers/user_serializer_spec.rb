@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
-describe UserSerializer do
+require 'rails_helper'
 
+describe UserSerializer do
   before do
     SiteSetting.anonymous_moderators_enabled = true
   end
@@ -43,5 +44,4 @@ describe UserSerializer do
       expect(json[:custom_fields]["parent_user_username"]).to eq(user2.username)
     end
   end
-
 end
