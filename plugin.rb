@@ -32,7 +32,7 @@ after_initialize do
   end
 
   add_model_callback("DiscourseAnonymousModerators::Link", :after_commit, on: [ :create, :update ]) do
-    UserCustomField.find_or_initialize_by(user: user, name: :parent_user_username).update_attributes!(value: parent_user.username)
+    UserCustomField.find_or_initialize_by(user: user, name: :parent_user_username).update!(value: parent_user.username)
   end
 
   # TODO Drop after Discourse 2.6.0 release
