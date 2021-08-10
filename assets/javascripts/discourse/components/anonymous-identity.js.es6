@@ -1,27 +1,27 @@
-import { default as computed } from "ember-addons/ember-computed-decorators";
+import discourseComputed from "discourse-common/utils/decorators";
 import { userPath } from "discourse/lib/url";
 
 export default Ember.Component.extend({
-  @computed("user.custom_fields.parent_user_username")
+  @discourseComputed("user.custom_fields.parent_user_username")
   username(username) {
     return username;
   },
 
-  @computed("username")
+  @discourseComputed("username")
   link(username) {
     return userPath(username);
   },
 
-  @computed("username")
+  @discourseComputed("username")
   shouldDisplay(username) {
     return this.get("currentUser.staff") && username;
   },
 
-  @computed("username")
+  @discourseComputed("username")
   dataUserCard(username) {
     if (this.get("noCard")) {
       return false;
     }
     return username;
-  },
+  }
 });
