@@ -1,12 +1,9 @@
 # frozen_string_literal: true
 
-require 'rails_helper'
+require "rails_helper"
 
 RSpec.describe DiscourseAnonymousModerators::SwitchController do
-
-  before do
-    SiteSetting.anonymous_moderators_enabled = true
-  end
+  before { SiteSetting.anonymous_moderators_enabled = true }
 
   let(:user) { Fabricate(:user, moderator: true) }
 
@@ -18,9 +15,7 @@ RSpec.describe DiscourseAnonymousModerators::SwitchController do
   end
 
   context "when logged in" do
-    before do
-      sign_in(user)
-    end
+    before { sign_in(user) }
 
     it "doesn't work when plugin is disabled" do
       post "/anonymous-moderators/become-anon.json"
@@ -46,7 +41,5 @@ RSpec.describe DiscourseAnonymousModerators::SwitchController do
       post "/anonymous-moderators/become-anon.json"
       expect(session[:current_user_id]).to eq(anon_user_id)
     end
-
   end
-
 end

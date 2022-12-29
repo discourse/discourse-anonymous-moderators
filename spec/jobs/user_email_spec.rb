@@ -1,19 +1,23 @@
 # frozen_string_literal: true
 
-require 'rails_helper'
-require_dependency 'jobs/base'
+require "rails_helper"
+require_dependency "jobs/base"
 
 describe Jobs::UserEmail do
   let(:user) { Fabricate(:user, last_seen_at: 11.minutes.ago) }
   let(:parent_user) { Fabricate(:user, last_seen_at: 11.minutes.ago) }
-  let!(:link) { DiscourseAnonymousModerators::Link.create!(user: user, parent_user: parent_user, last_used_at: Time.zone.now) }
+  let!(:link) do
+    DiscourseAnonymousModerators::Link.create!(
+      user: user,
+      parent_user: parent_user,
+      last_used_at: Time.zone.now,
+    )
+  end
   let(:mailer) { Mail::Message.new(to: user.email) }
 
-  before do
-    SiteSetting.anonymous_moderators_enabled = true
-  end
+  before { SiteSetting.anonymous_moderators_enabled = true }
 
-  it 'overwrites the to_address for anonymous users' do
+  it "overwrites the to_address for anonymous users" do
     UserNotifications.expects(:confirm_new_email).returns(mailer)
     Email::Sender.any_instance.expects(:send)
     Jobs::UserEmail.new.execute(type: :confirm_new_email, user_id: user.id)
