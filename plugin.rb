@@ -11,10 +11,9 @@ enabled_site_setting :anonymous_moderators_enabled
 require_relative "lib/anonymous_moderators/engine"
 require_relative "lib/anonymous_moderators/manager"
 
-register_asset 'stylesheets/anonymous_moderators.scss'
+register_asset "stylesheets/anonymous_moderators.scss"
 
 after_initialize do
-
   add_to_class(:user, :is_anonymous_moderator) do
     return DiscourseAnonymousModerators::Link.exists?(user: self)
   end
@@ -23,16 +22,16 @@ after_initialize do
     return DiscourseAnonymousModerators::Manager.acceptable_parent?(self)
   end
 
-  add_to_serializer(:current_user, :is_anonymous_moderator) do
-    object.is_anonymous_moderator
-  end
+  add_to_serializer(:current_user, :is_anonymous_moderator) { object.is_anonymous_moderator }
 
   add_to_serializer(:current_user, :can_become_anonymous_moderator) do
     object.can_become_anonymous_moderator
   end
 
-  add_model_callback("DiscourseAnonymousModerators::Link", :after_commit, on: [ :create, :update ]) do
-    UserCustomField.find_or_initialize_by(user: user, name: :parent_user_username).update!(value: parent_user.username)
+  add_model_callback("DiscourseAnonymousModerators::Link", :after_commit, on: %i[create update]) do
+    UserCustomField.find_or_initialize_by(user: user, name: :parent_user_username).update!(
+      value: parent_user.username,
+    )
   end
 
   # TODO Drop after Discourse 2.6.0 release
@@ -53,7 +52,5 @@ after_initialize do
     end
   end
 
-  ::Jobs::UserEmail.class_eval do
-    prepend ModifyUserEmail
-  end
+  ::Jobs::UserEmail.class_eval { prepend ModifyUserEmail }
 end

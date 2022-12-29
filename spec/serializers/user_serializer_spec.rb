@@ -1,15 +1,19 @@
 # frozen_string_literal: true
 
-require 'rails_helper'
+require "rails_helper"
 
 describe UserSerializer do
-  before do
-    SiteSetting.anonymous_moderators_enabled = true
-  end
+  before { SiteSetting.anonymous_moderators_enabled = true }
 
   let(:user1) { Fabricate(:user) }
   let(:user2) { Fabricate(:user) }
-  let!(:link) { DiscourseAnonymousModerators::Link.create!(user: user1, parent_user: user2, last_used_at: Time.zone.now) }
+  let!(:link) do
+    DiscourseAnonymousModerators::Link.create!(
+      user: user1,
+      parent_user: user2,
+      last_used_at: Time.zone.now,
+    )
+  end
   let(:moderator) { Fabricate(:moderator) }
 
   context "for regular users" do
