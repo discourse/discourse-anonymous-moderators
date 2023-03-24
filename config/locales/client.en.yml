@@ -2,4 +2,10 @@ en:
   js:
     anonymous_moderators:
       switch_to_anon: Switch to anonymous moderator account
-      switch_to_master: Switch to master account
+      switch_to_master: Switch to main account
+      current_account: Signed in as @{{username}}
+      signed_in_main: (main account)
+      signed_in_anon: (anonymous moderator account)
+    user_menu:
+      tabs:
+        anonymous_moderator: Anonymous Moderator Switcher
