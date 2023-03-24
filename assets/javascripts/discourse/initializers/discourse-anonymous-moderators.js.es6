@@ -2,8 +2,11 @@ import { withPluginApi } from "discourse/lib/plugin-api";
 import { ajax } from "discourse/lib/ajax";
 import { iconNode } from "discourse-common/lib/icon-library";
 import { userPath } from "discourse/lib/url";
+import AnonymousModeratorTab from "../components/anonymous-moderator-tab";
+import { inject as service } from "@ember/service";
 
-function initializeAnonymousUser(api) {
+// Can be removed once core drops the legacy user menu
+function setupLegacyUserMenu(api) {
   api.attachWidgetAction("user-menu", "switchToAnonUser", () => {
     ajax("/anonymous-moderators/become-anon", { method: "POST" }).then(() => {
       window.location.reload();
@@ -33,6 +36,27 @@ function initializeAnonymousUser(api) {
     } else {
       return false;
     }
+  });
+}
+
+function initializeAnonymousUser(api) {
+  setupLegacyUserMenu(api);
+
+  api.registerUserMenuTab((UserMenuTab) => {
+    return class extends UserMenuTab {
+      @service currentUser;
+
+      id = "anonymous_moderator";
+      icon = "user-secret";
+      panelComponent = AnonymousModeratorTab;
+
+      get shouldDisplay() {
+        return (
+          this.currentUser?.can_become_anonymous_moderator ||
+          this.currentUser?.is_anonymous_moderator
+        );
+      }
+    };
   });
 
   api.decorateWidget(`poster-name:after`, (dec) => {
