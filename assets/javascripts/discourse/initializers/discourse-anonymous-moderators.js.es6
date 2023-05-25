@@ -1,47 +1,10 @@
 import { withPluginApi } from "discourse/lib/plugin-api";
-import { ajax } from "discourse/lib/ajax";
 import { iconNode } from "discourse-common/lib/icon-library";
 import { userPath } from "discourse/lib/url";
 import AnonymousModeratorTab from "../components/anonymous-moderator-tab";
 import { inject as service } from "@ember/service";
 
-// Can be removed once core drops the legacy user menu
-function setupLegacyUserMenu(api) {
-  api.attachWidgetAction("user-menu", "switchToAnonUser", () => {
-    ajax("/anonymous-moderators/become-anon", { method: "POST" }).then(() => {
-      window.location.reload();
-    });
-  });
-
-  api.attachWidgetAction("user-menu", "switchToMasterUser", () => {
-    ajax("/anonymous-moderators/become-master", { method: "POST" }).then(() => {
-      window.location.reload();
-    });
-  });
-
-  api.addUserMenuGlyph((widget) => {
-    const user = widget.currentUser;
-    if (user.can_become_anonymous_moderator) {
-      return {
-        label: "anonymous_moderators.switch_to_anon",
-        icon: "user-secret",
-        action: "switchToAnonUser",
-      };
-    } else if (user.is_anonymous_moderator) {
-      return {
-        label: "anonymous_moderators.switch_to_master",
-        icon: "ban",
-        action: "switchToMasterUser",
-      };
-    } else {
-      return false;
-    }
-  });
-}
-
 function initializeAnonymousUser(api) {
-  setupLegacyUserMenu(api);
-
   api.registerUserMenuTab((UserMenuTab) => {
     return class extends UserMenuTab {
       @service currentUser;
