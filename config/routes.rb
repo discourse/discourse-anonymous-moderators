@@ -5,6 +5,6 @@ DiscourseAnonymousModerators::Engine.routes.draw do
   post "/become-master" => "switch#become_parent"
 end
 
-::Discourse::Application.routes.append do
+::Discourse::Application.routes.draw do
   mount ::DiscourseAnonymousModerators::Engine, at: "/anonymous-moderators"
 end
