@@ -1,10 +1,10 @@
 {
   "name": "discourse-anonymous-moderators",
   "version": "1.0.0",
-  "repository": "git@github.com:discourse/discourse-anonymous-moderators.git",
+  "repository": "https://github.com/discourse/discourse-anonymous-moderators",
   "author": "Discourse",
   "license": "MIT",
   "devDependencies": {
-    "eslint-config-discourse": "^1.1.8"
+    "eslint-config-discourse": "^3.5.0"
   }
 }

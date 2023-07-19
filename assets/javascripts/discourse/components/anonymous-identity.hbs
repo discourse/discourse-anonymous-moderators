@@ -1,0 +1,10 @@
+{{#if this.shouldDisplay}}
+  <a
+    href={{this.link}}
+    data-user-card={{this.dataUserCard}}
+    class="anon-identity"
+  >
+    {{d-icon "user-secret"}}
+    {{this.username}}
+  </a>
+{{/if}}

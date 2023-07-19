@@ -34,12 +34,7 @@ after_initialize do
     )
   end
 
-  # TODO Drop after Discourse 2.6.0 release
-  if respond_to?(:allow_staff_user_custom_field)
-    allow_staff_user_custom_field(:parent_user_username)
-  else
-    whitelist_staff_user_custom_field(:parent_user_username)
-  end
+  allow_staff_user_custom_field(:parent_user_username)
 
   module ModifyUserEmail
     def execute(args)
