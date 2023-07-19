@@ -9,18 +9,18 @@ export default class AnonymousModeratorTab extends Component {
   @tracked loading = false;
 
   @action
-  becomeAnonModerator() {
+  async becomeAnonModerator() {
     this.loading = true;
-    ajax("/anonymous-moderators/become-anon", { method: "POST" }).then(() => {
-      window.location.reload();
-    });
+
+    await ajax("/anonymous-moderators/become-anon", { method: "POST" });
+    window.location.reload();
   }
 
   @action
-  becomeMasterUser() {
+  async becomeMasterUser() {
     this.loading = true;
-    ajax("/anonymous-moderators/become-master", { method: "POST" }).then(() => {
-      window.location.reload();
-    });
+
+    await ajax("/anonymous-moderators/become-master", { method: "POST" });
+    window.location.reload();
   }
 }

@@ -23,11 +23,11 @@ function initializeAnonymousUser(api) {
   });
 
   api.decorateWidget(`poster-name:after`, (dec) => {
-    const attrs = dec.attrs;
-    const username = (attrs.userCustomFields || {}).parent_user_username;
+    const username = dec.attrs.userCustomFields?.parent_user_username;
     if (!username) {
       return null;
     }
+
     return dec.h(
       "span.poster-parent-username",
       dec.h(
