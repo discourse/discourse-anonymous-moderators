@@ -1,8 +1,8 @@
-import { withPluginApi } from "discourse/lib/plugin-api";
-import { iconNode } from "discourse-common/lib/icon-library";
-import { userPath } from "discourse/lib/url";
-import AnonymousModeratorTab from "../components/anonymous-moderator-tab";
 import { inject as service } from "@ember/service";
+import { withPluginApi } from "discourse/lib/plugin-api";
+import { userPath } from "discourse/lib/url";
+import { iconNode } from "discourse-common/lib/icon-library";
+import AnonymousModeratorTab from "../components/anonymous-moderator-tab";
 
 function initializeAnonymousUser(api) {
   api.registerUserMenuTab((UserMenuTab) => {
