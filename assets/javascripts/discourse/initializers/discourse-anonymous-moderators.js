@@ -48,7 +48,7 @@ export default {
   name: "discourse-anonymous-moderators",
 
   initialize(container) {
-    const siteSettings = container.lookup("site-settings:main");
+    const siteSettings = container.lookup("service:site-settings");
     if (siteSettings.anonymous_moderators_enabled) {
       withPluginApi("0.8", initializeAnonymousUser);
     }
