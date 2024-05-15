@@ -10,6 +10,7 @@ enabled_site_setting :anonymous_moderators_enabled
 
 require_relative "lib/anonymous_moderators/engine"
 require_relative "lib/anonymous_moderators/manager"
+require_relative "lib/anonymous_moderators/user_email_job_extension"
 
 register_asset "stylesheets/anonymous_moderators.scss"
 
@@ -36,16 +37,5 @@ after_initialize do
 
   allow_staff_user_custom_field(:parent_user_username)
 
-  module ModifyUserEmail
-    def execute(args)
-      return super(args) unless SiteSetting.anonymous_moderators_enabled
-
-      if parent = DiscourseAnonymousModerators::Link.find_by(user_id: args[:user_id])&.parent_user
-        args[:to_address] = parent.email
-      end
-      super(args)
-    end
-  end
-
-  ::Jobs::UserEmail.class_eval { prepend ModifyUserEmail }
+  ::Jobs::UserEmail.prepend(DiscourseAnonymousModerators::UserEmailJobExtension)
 end
