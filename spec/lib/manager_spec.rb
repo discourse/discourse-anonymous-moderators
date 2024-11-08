@@ -28,7 +28,10 @@ describe DiscourseAnonymousModerators::Manager do
     )
   end
 
-  before { SiteSetting.anonymous_moderators_enabled = true }
+  before do
+    SiteSetting.anonymous_moderators_enabled = true
+    SiteSetting.normalize_emails = false
+  end
 
   describe "switching to existing anonymous account" do
     it "returns nil when disabled" do

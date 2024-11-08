@@ -3,7 +3,10 @@
 require "rails_helper"
 
 RSpec.describe DiscourseAnonymousModerators::SwitchController do
-  before { SiteSetting.anonymous_moderators_enabled = true }
+  before do
+    SiteSetting.anonymous_moderators_enabled = true
+    SiteSetting.normalize_emails = false
+  end
 
   let(:user) { Fabricate(:user, moderator: true) }
 
