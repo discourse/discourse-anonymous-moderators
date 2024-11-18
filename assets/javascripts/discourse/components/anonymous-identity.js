@@ -1,5 +1,5 @@
 import Component from "@glimmer/component";
-import { inject as service } from "@ember/service";
+import { service } from "@ember/service";
 import { userPath } from "discourse/lib/url";
 
 export default class AnonymousIdentity extends Component {
