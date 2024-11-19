@@ -1,4 +1,4 @@
-import { inject as service } from "@ember/service";
+import { service } from "@ember/service";
 import { withPluginApi } from "discourse/lib/plugin-api";
 import { userPath } from "discourse/lib/url";
 import { iconNode } from "discourse-common/lib/icon-library";
