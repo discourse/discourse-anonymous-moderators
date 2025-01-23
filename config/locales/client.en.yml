@@ -1,5 +1,7 @@
 en:
   js:
+    discourse_anonymous_moderators:
+      title: "Anonymous moderators"
     anonymous_moderators:
       switch_to_anon: Switch to anonymous moderator account
       switch_to_master: Switch to main account
