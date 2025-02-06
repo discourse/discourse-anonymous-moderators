@@ -1,7 +1,7 @@
 import { service } from "@ember/service";
+import { iconNode } from "discourse/lib/icon-library";
 import { withPluginApi } from "discourse/lib/plugin-api";
 import { userPath } from "discourse/lib/url";
-import { iconNode } from "discourse-common/lib/icon-library";
 import AnonymousModeratorTab from "../components/anonymous-moderator-tab";
 
 function initializeAnonymousUser(api) {
