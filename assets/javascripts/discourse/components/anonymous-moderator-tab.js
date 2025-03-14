@@ -6,6 +6,7 @@ import { ajax } from "discourse/lib/ajax";
 
 export default class AnonymousModeratorTab extends Component {
   @service currentUser;
+
   @tracked loading = false;
 
   @action
