@@ -4,11 +4,11 @@ import { userPath } from "discourse/lib/url";
 
 export default class AnonymousParentUsername extends Component {
   static shouldRender(args) {
-    return args.post.userCustomFields?.parent_user_username;
+    return args.post.user_custom_fields?.parent_user_username;
   }
 
   get username() {
-    return this.args.post.userCustomFields?.parent_user_username;
+    return this.args.post.user_custom_fields?.parent_user_username;
   }
 
   <template>
@@ -16,7 +16,7 @@ export default class AnonymousParentUsername extends Component {
       <a
         class="anon-identity"
         data-user-card={{this.username}}
-        href={{userPath}}
+        href={{userPath this.username}}
       >
         {{icon "user-secret"}}
         {{this.username}}
