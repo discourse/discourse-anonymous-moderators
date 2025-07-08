@@ -1,11 +1,9 @@
 # frozen_string_literal: true
 
-require "rails_helper"
-
 RSpec.describe "Anonymous Moderator Parent Username", type: :system do
   before { SiteSetting.anonymous_moderators_enabled = true }
 
-  let!(:user) { Fabricate(:user) }
+  fab!(:user)
   let!(:user1) { Fabricate(:user) }
   let!(:user2) { Fabricate(:user) }
   let!(:link) do
@@ -15,9 +13,9 @@ RSpec.describe "Anonymous Moderator Parent Username", type: :system do
       last_used_at: Time.zone.now,
     )
   end
-  let!(:moderator) { Fabricate(:moderator) }
+  fab!(:moderator)
 
-  let!(:topic) { Fabricate(:topic) }
+  fab!(:topic)
   let!(:post) { Fabricate(:post, topic: topic, user: user) }
   let!(:post2) { Fabricate(:post, topic: topic, user: user1) }
   let!(:post3) { Fabricate(:post, topic: topic, user: user2) }
