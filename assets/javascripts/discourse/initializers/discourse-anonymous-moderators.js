@@ -1,8 +1,10 @@
 import { service } from "@ember/service";
+import { withSilencedDeprecations } from "discourse/lib/deprecated";
 import { iconNode } from "discourse/lib/icon-library";
 import { withPluginApi } from "discourse/lib/plugin-api";
 import { userPath } from "discourse/lib/url";
 import AnonymousModeratorTab from "../components/anonymous-moderator-tab";
+import AnonymousParentUsername from "../components/anonymous-parent-username";
 
 function initializeAnonymousUser(api) {
   api.registerUserMenuTab((UserMenuTab) => {
@@ -22,6 +24,21 @@ function initializeAnonymousUser(api) {
     };
   });
 
+  customizePost(api);
+}
+
+function customizePost(api) {
+  api.renderAfterWrapperOutlet(
+    "post-meta-data-poster-name",
+    AnonymousParentUsername
+  );
+
+  withSilencedDeprecations("discourse.post-stream-widget-overrides", () =>
+    customizeWidgetPost(api)
+  );
+}
+
+function customizeWidgetPost(api) {
   api.decorateWidget(`poster-name:after`, (dec) => {
     const username = dec.attrs.userCustomFields?.parent_user_username;
     if (!username) {
@@ -49,8 +66,9 @@ export default {
 
   initialize(container) {
     const siteSettings = container.lookup("service:site-settings");
+
     if (siteSettings.anonymous_moderators_enabled) {
-      withPluginApi("0.8", initializeAnonymousUser);
+      withPluginApi(initializeAnonymousUser);
     }
   },
 };
