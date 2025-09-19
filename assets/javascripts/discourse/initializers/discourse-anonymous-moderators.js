@@ -1,8 +1,5 @@
 import { service } from "@ember/service";
-import { withSilencedDeprecations } from "discourse/lib/deprecated";
-import { iconNode } from "discourse/lib/icon-library";
 import { withPluginApi } from "discourse/lib/plugin-api";
-import { userPath } from "discourse/lib/url";
 import AnonymousModeratorTab from "../components/anonymous-moderator-tab";
 import AnonymousParentUsername from "../components/anonymous-parent-username";
 
@@ -32,33 +29,6 @@ function customizePost(api) {
     "post-meta-data-poster-name",
     AnonymousParentUsername
   );
-
-  withSilencedDeprecations("discourse.post-stream-widget-overrides", () =>
-    customizeWidgetPost(api)
-  );
-}
-
-function customizeWidgetPost(api) {
-  api.decorateWidget(`poster-name:after`, (dec) => {
-    const username = dec.attrs.userCustomFields?.parent_user_username;
-    if (!username) {
-      return null;
-    }
-
-    return dec.h(
-      "span.poster-parent-username",
-      dec.h(
-        "a.anon-identity",
-        {
-          attributes: {
-            "data-user-card": username,
-            href: userPath(),
-          },
-        },
-        [iconNode("user-secret"), ` ${username}`]
-      )
-    );
-  });
 }
 
 export default {
