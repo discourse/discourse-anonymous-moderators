@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe "Anonymous Moderator Parent Username", type: :system do
+RSpec.describe "Anonymous Moderator Parent Username" do
   before { SiteSetting.anonymous_moderators_enabled = true }
 
   fab!(:user)
