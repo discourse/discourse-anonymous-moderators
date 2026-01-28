@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "rails_helper"
-
 describe DiscourseAnonymousModerators::Manager do
   let(:parent1) { Fabricate(:user) }
   let(:anon1) { Fabricate(:user) }
